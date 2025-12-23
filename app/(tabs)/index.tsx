@@ -1,98 +1,183 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { useRouter } from "expo-router";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const router = useRouter();
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  return (
+    <ScrollView style={styles.container}>
+      {/* HERO */}
+      <View style={styles.hero}>
+        <Text style={styles.title}>🌸 Natural Cosmetics</Text>
+        <Text style={styles.subtitle}>
+          Nâng niu vẻ đẹp tự nhiên của bạn
+        </Text>
+
+        <TouchableOpacity
+          style={styles.mainButton}
+          onPress={() => router.push("/(tabs)/products")}
+        >
+          <Text style={styles.buttonText}>Xem sản phẩm</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* CATEGORIES */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>💄 Danh mục nổi bật</Text>
+
+        <View style={styles.categoryRow}>
+          <Category name="Son môi" />
+          <Category name="Chăm sóc da" />
+          <Category name="Trang điểm" />
+          <Category name="Nước hoa" />
+        </View>
+      </View>
+
+      {/* FEATURED PRODUCTS */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>🔥 Sản phẩm nổi bật</Text>
+
+        <View style={styles.productCard}>
+          <Text style={styles.productName}>Son lì thiên nhiên</Text>
+          <Text style={styles.productPrice}>250.000 ₫</Text>
+        </View>
+
+        <View style={styles.productCard}>
+          <Text style={styles.productName}>Sữa rửa mặt thảo mộc</Text>
+          <Text style={styles.productPrice}>180.000 ₫</Text>
+        </View>
+      </View>
+
+      {/* COMMITMENT */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>✨ Cam kết của chúng tôi</Text>
+
+        <Text style={styles.commit}>🌿 Thành phần thiên nhiên</Text>
+        <Text style={styles.commit}>🚚 Giao hàng nhanh toàn quốc</Text>
+        <Text style={styles.commit}>🔐 Mỹ phẩm chính hãng</Text>
+      </View>
+
+      {/* FOOTER */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>📞 Hotline: 1900 1234</Text>
+        <Text style={styles.footerText}>© 2025 Natural Cosmetics</Text>
+      </View>
+    </ScrollView>
   );
 }
 
+/* COMPONENT CATEGORY */
+function Category({ name }: { name: string }) {
+  return (
+    <View style={styles.category}>
+      <Text style={styles.categoryText}>{name}</Text>
+    </View>
+  );
+}
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    backgroundColor: "#1a001a",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+
+  hero: {
+    padding: 30,
+    alignItems: "center",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+
+  title: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#FF1493",
+  },
+
+  subtitle: {
+    color: "#FFB6C1",
+    fontSize: 16,
+    marginVertical: 10,
+    textAlign: "center",
+  },
+
+  mainButton: {
+    backgroundColor: "#FF1493",
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 25,
+    marginTop: 10,
+  },
+
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+
+  section: {
+    padding: 20,
+  },
+
+  sectionTitle: {
+    color: "#FF69B4",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+
+  categoryRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+
+  category: {
+    backgroundColor: "#2a002a",
+    width: "48%",
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 10,
+    alignItems: "center",
+  },
+
+  categoryText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+
+  productCard: {
+    backgroundColor: "#2a002a",
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 10,
+  },
+
+  productName: {
+    color: "#fff",
+    fontSize: 16,
+  },
+
+  productPrice: {
+    color: "#FF1493",
+    fontWeight: "bold",
+    marginTop: 5,
+  },
+
+  commit: {
+    color: "#fff",
+    fontSize: 16,
+    marginBottom: 5,
+  },
+
+  footer: {
+    alignItems: "center",
+    padding: 20,
+  },
+
+  footerText: {
+    color: "#aaa",
+    fontSize: 14,
   },
 });
