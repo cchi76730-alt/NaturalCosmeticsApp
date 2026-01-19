@@ -7,11 +7,17 @@ import {
   View,
 } from "react-native";
 
+import BannerSlider from "../components/BannerSlider";
+
+
 export default function HomeScreen() {
   const router = useRouter();
 
   return (
     <ScrollView style={styles.container}>
+      <View style={styles.bannerWrapper}>
+              <BannerSlider />
+            </View>
       {/* HERO */}
       <View style={styles.hero}>
         <Text style={styles.title}>🌸 Natural Cosmetics</Text>
@@ -84,9 +90,14 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#1a001a",
   },
+   bannerWrapper: {
+    width: "100%",
+    height: 200,
+    overflow: "hidden",
+  },
 
   hero: {
-    padding: 30,
+    padding: 45,
     alignItems: "center",
   },
 
@@ -105,10 +116,10 @@ const styles = StyleSheet.create({
 
   mainButton: {
     backgroundColor: "#FF1493",
-    paddingVertical: 14,
-    paddingHorizontal: 40,
-    borderRadius: 25,
-    marginTop: 10,
+    paddingVertical: 20,
+    paddingHorizontal: 45,
+    borderRadius: 30,
+    marginTop: 20,
   },
 
   buttonText: {

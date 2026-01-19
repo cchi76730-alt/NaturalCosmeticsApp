@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Image, StyleSheet, Dimensions } from "react-native";
+import { Dimensions, Image, StyleSheet, View } from "react-native";
 import { SwiperFlatList } from "react-native-swiper-flatlist";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
+const BANNER_HEIGHT = 250; // 🔥 PHẢI TRÙNG với bannerWrapper
 
 export default function BannerSlider() {
   const banners = [
@@ -13,9 +14,17 @@ export default function BannerSlider() {
 
   return (
     <View style={styles.container}>
-      <SwiperFlatList autoplay autoplayDelay={2} autoplayLoop showPagination={false}>
+      <SwiperFlatList
+        autoplay
+        autoplayDelay={3}
+        autoplayLoop
+        showPagination={false}
+        style={{ height: BANNER_HEIGHT }}   // ✅ QUAN TRỌNG
+      >
         {banners.map((img, index) => (
-          <Image key={index} source={img} style={styles.banner} />
+          <View key={index} style={styles.slide}>
+            <Image source={img} style={styles.banner} />
+          </View>
         ))}
       </SwiperFlatList>
     </View>
@@ -24,12 +33,16 @@ export default function BannerSlider() {
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject, // full screen background
-    zIndex: -1,
+    width: "100%",
+    height: BANNER_HEIGHT,
+  },
+  slide: {
+    width: width,
+    height: BANNER_HEIGHT,  // ✅ ép height cho từng slide
   },
   banner: {
-    width: width,
-    height: height,
+    width: "100%",
+    height: "100%",         // ✅ phủ kín
     resizeMode: "cover",
   },
 });

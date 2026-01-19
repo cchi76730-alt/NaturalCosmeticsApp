@@ -1,7 +1,10 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useAuth } from "../components/context/AuthContext";
+
 import {
   Alert,
+  Image,
   Platform,
   ScrollView,
   StyleSheet,
@@ -27,11 +30,10 @@ export default function LoginScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
-  const testButton = () => {
-    console.log("=== BUTTON CLICKED ===");
-    showAlert("Success", "Button works!");
-  };
+
+ 
 
   const handleLogin = async () => {
     console.log("🔑 ===== LOGIN CLICKED =====");
@@ -48,6 +50,7 @@ export default function LoginScreen() {
       console.log("Got user:", user);
 
       if (user?.id) {
+        login(user);
         showAlert("Thành công", "Đăng nhập thành công!");
         router.replace("/(tabs)");
       } else {
@@ -76,6 +79,10 @@ export default function LoginScreen() {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
+        <Image
+  source={require("../../assets/images/Logo - Cindy.png")} // ⚠️ đổi đúng path logo của bạn
+  style={styles.logo}
+/>
         <Text style={styles.title}>ĐĂNG NHẬP</Text>
 
         <TextInput
@@ -105,12 +112,7 @@ export default function LoginScreen() {
           <Text style={styles.forgotText}>🔑 Quên mật khẩu?</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.button, styles.testButton]}
-          onPress={testButton}
-        >
-          <Text style={styles.buttonText}>✅ TEST BUTTON</Text>
-        </TouchableOpacity>
+        
 
         <TouchableOpacity
           style={[
@@ -135,7 +137,8 @@ export default function LoginScreen() {
           </Text>
         </TouchableOpacity>
 
-        <Text style={styles.footerText}>NATURAL COSMETICS</Text>
+        <Text style={styles.footerText}>CINDY BEAUTY</Text>
+        <Text style={styles.footerText}>Mai Chi</Text>
       </ScrollView>
     </View>
   );
@@ -149,7 +152,7 @@ const styles = StyleSheet.create({
   },
   bannerWrapper: {
     width: "100%",
-    height: 200,
+    height: 250,
     overflow: "hidden",
   },
   scrollContent: {
@@ -158,6 +161,18 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 40, // Thêm padding để tránh bị che
   },
+  logo: {
+  width: 120,
+  height: 120,
+  resizeMode: "contain",
+  
+  marginBottom: 10,
+  borderRadius: 60,
+  backgroundColor: "#fff",
+  padding: 10,
+
+},
+
   title: {
     fontSize: 32,
     color: "#FF66B2",

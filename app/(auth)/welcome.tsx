@@ -1,6 +1,6 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
+import React from "react";
+import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -19,8 +19,8 @@ export default function WelcomeScreen() {
       <View style={styles.overlay}>
         {/* Tiêu đề với màu khác nhau */}
         <Text style={styles.title}>
-          <Text style={{ color: "#FFD700" }}>NATURAL{"\n"}</Text>
-          <Text style={{ color: "#FF1493" }}>COSMETICS</Text>
+          <Text style={{ color: "#FFD700" }}>CINDY{"\n"}</Text>
+          <Text style={{ color: "#FF1493" }}>BEAUTY</Text>
         </Text>
 
         {/* Thông tin mô tả */}
