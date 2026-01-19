@@ -1,49 +1,90 @@
-// app/(admin)/staffs.tsx
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { deleteStaff, getStaffs, Staff } from "../../services/admin.staff.service";
 
-const staffs = [
-  { id: 1, name: "Nguyễn Văn A", email: "a@gmail.com", role: "ADMIN" },
-  { id: 2, name: "Trần Thị B", email: "b@gmail.com", role: "STAFF" },
-  { id: 3, name: "Lê Văn C", email: "c@gmail.com", role: "STAFF" },
-  { id: 4, name: "Phạm Thị D", email: "d@gmail.com", role: "MANAGER" },
-];
+export default function StaffIndexScreen() {
+  const [staffs, setStaffs] = useState<Staff[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default function StaffsScreen() {
-  const getRoleBadge = (role: string) => {
-    switch (role) {
-      case "ADMIN":
-        return { text: "Quản trị viên", color: "#e74c3c", icon: "👑" };
-      case "MANAGER":
-        return { text: "Quản lý", color: "#3498db", icon: "💼" };
-      case "STAFF":
-        return { text: "Nhân viên", color: "#27ae60", icon: "👤" };
-      default:
-        return { text: role, color: "#95a5a6", icon: "👤" };
+  useFocusEffect(
+  useCallback(() => {
+    setLoading(true);
+    loadStaffs();
+  }, [])
+);
+
+
+  const loadStaffs = async () => {
+    try {
+      const data = await getStaffs();
+      setStaffs(data);
+    } catch (e) {
+      console.log("Load staff error:", e);
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (loading) {
+    return <ActivityIndicator size="large" style={{ marginTop: 60 }} />;
+  }
+
+  const handleDelete = (id: number) => {
+  console.log("DELETE STAFF ID:", id); // 🔥 CHECK
+
+  Alert.alert(
+    "Xác nhận",
+    "Bạn có chắc muốn xóa nhân viên này?",
+    [
+      { text: "Hủy", style: "cancel" },
+      {
+        text: "Xóa",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await deleteStaff(id);
+            console.log("DELETE OK");
+
+            loadStaffs(); // 🔥 RẤT QUAN TRỌNG
+          } catch (error) {
+            console.log("DELETE ERROR:", error);
+            Alert.alert("Lỗi", "Không thể xóa");
+          }
+        },
+      },
+    ]
+  );
+};
+
+
+
   return (
+    
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>👥 Quản lý nhân viên</Text>
-        <Text style={styles.subtitle}>Danh sách nhân viên trong hệ thống</Text>
+        <Text style={styles.subtitle}>Danh sách nhân viên</Text>
+
+        <TouchableOpacity
+    style={styles.addButton}
+    onPress={() => router.push("/admin/staffs/create")}
+  >
+    <Text style={styles.addButtonText}>➕ Thêm nhân viên</Text>
+  </TouchableOpacity>
       </View>
 
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>{staffs.length}</Text>
-          <Text style={styles.statLabel}>Tổng số</Text>
-        </View>
-        <View style={[styles.statCard, styles.statCardAdmin]}>
-          <Text style={styles.statNumber}>
-            {staffs.filter(s => s.role === "ADMIN").length}
-          </Text>
-          <Text style={styles.statLabel}>Admin</Text>
-        </View>
-        <View style={[styles.statCard, styles.statCardStaff]}>
-          <Text style={styles.statNumber}>
-            {staffs.filter(s => s.role === "STAFF").length}
-          </Text>
           <Text style={styles.statLabel}>Nhân viên</Text>
         </View>
       </View>
@@ -52,165 +93,142 @@ export default function StaffsScreen() {
         data={staffs}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContent}
-        renderItem={({ item }) => {
-          const roleBadge = getRoleBadge(item.role);
-          return (
-            <View style={styles.card}>
-              <View style={styles.cardHeader}>
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>
-                    {item.name.charAt(0)}
-                  </Text>
-                </View>
-                <View style={styles.cardInfo}>
-                  <Text style={styles.name}>{item.name}</Text>
-                  <Text style={styles.email}>✉️ {item.email}</Text>
-                </View>
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>
+                  {item.username.charAt(0)}
+                </Text>
               </View>
 
-              <View style={styles.cardFooter}>
-                <View style={[styles.roleBadge, { backgroundColor: roleBadge.color }]}>
-                  <Text style={styles.roleIcon}>{roleBadge.icon}</Text>
-                  <Text style={styles.roleText}>{roleBadge.text}</Text>
-                </View>
+              <View style={styles.cardInfo}>
+                <Text style={styles.name}>{item.username}</Text>
+                <Text style={styles.email}>✉️ {item.email}</Text>
+                {!item.active && (
+                  <Text style={styles.inactive}>⛔ Đã khóa</Text>
+                )}
               </View>
             </View>
-          );
-        }}
+
+            <View style={styles.cardFooter}>
+  <View style={styles.roleBadge}>
+    <Text>👤</Text>
+    <Text style={styles.roleText}>Nhân viên</Text>
+  </View>
+
+  <View style={{ flexDirection: "row", gap: 8 }}>
+    <TouchableOpacity
+      style={styles.editBtn}
+      onPress={() =>
+        router.push(`/admin/staffs/edit?id=${item.id}`)
+      }
+    >
+      <Text style={styles.btnText}>✏️ Sửa</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+  style={styles.deleteBtn}
+  onPress={() => handleDelete(item.id)}
+>
+  <Text style={styles.btnText}>🗑️ Xóa</Text>
+</TouchableOpacity>
+  </View>
+</View>
+
+          </View>
+        )}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: "#f8f9fa",
-  },
+  container: { flex: 1, backgroundColor: "#f8f9fa" },
   header: {
     backgroundColor: "#fff",
     padding: 24,
     paddingTop: 40,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
   },
-  title: { 
-    fontSize: 28, 
-    fontWeight: "bold",
-    color: "#2c3e50",
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#7f8c8d",
-    marginTop: 4,
-  },
-  statsContainer: {
-    flexDirection: "row",
-    padding: 20,
-    gap: 12,
-  },
+  title: { fontSize: 26, fontWeight: "bold" },
+  subtitle: { color: "#7f8c8d" },
+
+  statsContainer: { padding: 20 },
   statCard: {
-    flex: 1,
-    backgroundColor: "#9b59b6",
-    padding: 16,
-    borderRadius: 16,
-    alignItems: "center",
-    shadowColor: "#9b59b6",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  statCardAdmin: {
-    backgroundColor: "#e74c3c",
-    shadowColor: "#e74c3c",
-  },
-  statCardStaff: {
     backgroundColor: "#27ae60",
-    shadowColor: "#27ae60",
+    borderRadius: 16,
+    padding: 16,
+    alignItems: "center",
   },
-  statNumber: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  statLabel: {
-    fontSize: 11,
-    color: "#fff",
-    marginTop: 4,
-    opacity: 0.9,
-  },
-  listContent: {
-    padding: 20,
-    paddingTop: 0,
-  },
+  statNumber: { fontSize: 26, fontWeight: "bold", color: "#fff" },
+  statLabel: { color: "#fff" },
+
+  listContent: { padding: 20 },
   card: {
     backgroundColor: "#fff",
     borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    alignItems: "center",
+    padding: 16,
     marginBottom: 16,
   },
+  cardHeader: { flexDirection: "row", marginBottom: 12 },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: "#3498db",
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
     marginRight: 16,
   },
-  avatarText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  cardInfo: {
-    flex: 1,
-  },
-  name: { 
-    fontSize: 18, 
-    fontWeight: "700",
-    color: "#2c3e50",
-    marginBottom: 4,
-  },
-  email: {
-    fontSize: 14,
-    color: "#7f8c8d",
-  },
-  cardFooter: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-  },
+  avatarText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+  cardInfo: { flex: 1 },
+  name: { fontSize: 17, fontWeight: "600" },
+  email: { color: "#7f8c8d" },
+  inactive: { color: "#e74c3c", marginTop: 4 },
+
+  cardFooter: { flexDirection: "row" },
   roleBadge: {
     flexDirection: "row",
-    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#27ae60",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
-    gap: 6,
   },
-  roleIcon: {
-    fontSize: 14,
-  },
-  roleText: {
-    color: "#fff",
-    fontSize: 13,
-    fontWeight: "600",
-  },
+  roleText: { color: "#fff", fontWeight: "600" },
+
+  addButton: {
+  marginTop: 12,
+  backgroundColor: "#3498db",
+  paddingVertical: 10,
+  borderRadius: 12,
+  alignItems: "center",
+},
+addButtonText: {
+  color: "#fff",
+  fontWeight: "600",
+  fontSize: 16,
+},
+
+editBtn: {
+  backgroundColor: "#3498db",
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 10,
+},
+
+deleteBtn: {
+  backgroundColor: "#e74c3c",
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 10,
+},
+
+btnText: {
+  color: "#fff",
+  fontWeight: "600",
+},
+
 });
