@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -14,6 +13,7 @@ import {
 } from "react-native";
 
 import BannerSlider from "../components/BannerSlider";
+import api from "../services/api"; // ✅ DÙNG API CHUNG
 
 /* =====================
    TYPES
@@ -42,7 +42,7 @@ const featuredCategories: Category[] = [
 ];
 
 /* =====================
-   MAP IMAGE LOCAL
+   MAP IMAGE LOCAL (DEMO)
 ===================== */
 const getLocalImage = (image?: string): ImageSourcePropType => {
   switch (image) {
@@ -74,18 +74,19 @@ const getLocalImage = (image?: string): ImageSourcePropType => {
 ===================== */
 export default function HomeScreen() {
   const router = useRouter();
+
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [saleProducts, setSaleProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/products/featured")
+    api
+      .get("/products/featured") // ✅ KHÔNG localhost
       .then((res) => {
         setFeaturedProducts(res.data);
         setSaleProducts(res.data.slice(0, 5));
       })
-      .catch((err) => console.log("❌ Lỗi load sản phẩm", err))
+      .catch((err) => console.log("❌ Lỗi load sản phẩm:", err))
       .finally(() => setLoading(false));
   }, []);
 
@@ -124,7 +125,10 @@ export default function HomeScreen() {
               onPress={() =>
                 router.push({
                   pathname: "/(tabs)/products",
-                  params: { categoryId: item.id },
+                  params: {
+                    categoryId: item.id,
+                    categoryName: item.name,
+                  },
                 })
               }
             >
@@ -138,9 +142,9 @@ export default function HomeScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>🔥 Sản phẩm nổi bật</Text>
 
-        {loading ? (
-          <ActivityIndicator size="large" color="#FF1493" />
-        ) : (
+        {loading && <ActivityIndicator size="large" color="#FF1493" />}
+
+        {!loading && (
           <FlatList
             data={featuredProducts}
             horizontal
@@ -149,68 +153,23 @@ export default function HomeScreen() {
             renderItem={({ item }) => (
               <View style={styles.card}>
                 <View style={styles.imageBox}>
-                  <Image source={getLocalImage(item.image)} style={styles.image} />
+                  <Image
+                    source={getLocalImage(item.image)}
+                    style={styles.image}
+                  />
                 </View>
-                <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
-                <Text style={styles.price}>{item.price.toLocaleString()} ₫</Text>
-              </View>
-            )}
-          />
-        )}
-      </View>
 
-      {/* ===== SALE ===== */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>💥 Sản phẩm SALE</Text>
-
-        {!loading && (
-          <FlatList
-            data={saleProducts}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => `sale-${item.id}`}
-            renderItem={({ item }) => (
-              <View style={styles.saleCard}>
-                <View style={styles.imageBox}>
-                  <Image source={getLocalImage(item.image)} style={styles.image} />
-                  <View style={styles.saleBadge}>
-                    <Text style={styles.saleText}>SALE</Text>
-                  </View>
-                </View>
-                <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
-                <Text style={styles.oldPrice}>
-                  {(item.price * 1.2).toLocaleString()} ₫
+                <Text style={styles.name} numberOfLines={2}>
+                  {item.name}
                 </Text>
-                <Text style={styles.price}>{item.price.toLocaleString()} ₫</Text>
+
+                <Text style={styles.price}>
+                  {item.price.toLocaleString()} ₫
+                </Text>
               </View>
             )}
           />
         )}
-      </View>
-
-      {/* ===== GIỚI THIỆU ===== */}
-      <View style={styles.introSection}>
-        <View style={styles.introBox}>
-          <Text style={styles.introTitle}>🌸 Về Natural Cosmetics</Text>
-          <Text style={styles.introText}>
-            Chúng tôi cung cấp mỹ phẩm chính hãng, chiết xuất thiên nhiên,
-            an toàn và phù hợp làn da phụ nữ Việt.
-          </Text>
-        </View>
-
-        <View style={styles.introBox}>
-          <Text style={styles.introTitle}>💎 Cam kết</Text>
-          <Text style={styles.introText}>✔ Sản phẩm chính hãng</Text>
-          <Text style={styles.introText}>✔ Không hóa chất độc hại</Text>
-          <Text style={styles.introText}>✔ Hoàn tiền nếu hàng giả</Text>
-        </View>
-
-        <View style={styles.introBox}>
-          <Text style={styles.introTitle}>🚚 Dịch vụ</Text>
-          <Text style={styles.introText}>⚡ Giao hàng toàn quốc</Text>
-          <Text style={styles.introText}>💬 Tư vấn miễn phí</Text>
-          <Text style={styles.introText}>🔐 Bảo mật thông tin</Text>
-        </View>
       </View>
 
       {/* ===== FOOTER ===== */}
@@ -228,7 +187,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { backgroundColor: "#1a001a" },
   bannerWrapper: { height: 200 },
-  hero: { padding: 70, alignItems: "center" },
+  hero: { padding: 60, alignItems: "center" },
   title: { fontSize: 26, fontWeight: "bold", color: "#FF1493" },
   subtitle: { color: "#FFB6C1", marginTop: 6 },
   mainButton: {
@@ -263,13 +222,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginRight: 12,
   },
-  saleCard: {
-    width: 140,
-    backgroundColor: "#3a002a",
-    borderRadius: 14,
-    padding: 10,
-    marginRight: 12,
-  },
   imageBox: {
     height: 80,
     backgroundColor: "#fff",
@@ -279,39 +231,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   image: { width: "70%", height: "70%", resizeMode: "contain" },
-  saleBadge: {
-    position: "absolute",
-    top: 6,
-    right: 6,
-    backgroundColor: "red",
-    borderRadius: 6,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-  },
-  saleText: { color: "#fff", fontSize: 10, fontWeight: "bold" },
   name: { color: "#fff", fontSize: 14 },
   price: { color: "#FF1493", fontWeight: "bold", marginTop: 4 },
-  oldPrice: {
-    color: "#aaa",
-    fontSize: 12,
-    textDecorationLine: "line-through",
-  },
-  introSection: { padding: 16 },
-  introBox: {
-    backgroundColor: "#2a002a",
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: "#FF69B4",
-  },
-  introTitle: {
-    color: "#FF69B4",
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  introText: { color: "#ddd", fontSize: 14, lineHeight: 20 },
   footer: { alignItems: "center", padding: 20 },
   footerText: { color: "#aaa", fontSize: 13 },
 });

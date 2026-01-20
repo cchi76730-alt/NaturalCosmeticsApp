@@ -1,8 +1,7 @@
-// services/api.ts
 import axios from "axios";
 import { Platform } from "react-native";
 
-const BASE_IP = "10.18.7.211";
+const BASE_IP = "192.168.100.109";
 
 const getBaseURL = () => {
   if (__DEV__) {
@@ -10,7 +9,12 @@ const getBaseURL = () => {
       return "http://localhost:8080/api";
     }
 
-    // iOS + Android (thiết bị thật)
+    // Android Emulator
+    if (Platform.OS === "android") {
+      return "http://10.0.2.2:8080/api";
+    }
+
+    // iOS simulator + thiết bị thật
     return `http://${BASE_IP}:8080/api`;
   }
 
