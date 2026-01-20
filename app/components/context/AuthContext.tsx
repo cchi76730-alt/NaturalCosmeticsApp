@@ -1,17 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { User } from "../../types/User";
 
-interface User {
-  id: number;
-  username: string;
-  role?: string;
-}
-
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (user: User) => Promise<void>;
   logout: () => Promise<void>;
+  setUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,7 +16,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔄 LOAD USER KHI APP KHỞI ĐỘNG
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -38,21 +33,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     loadUser();
   }, []);
 
-  // 🔐 LOGIN
   const login = async (userData: User) => {
-    console.log("🔐 SET USER:", userData);
     setUser(userData);
     await AsyncStorage.setItem("user", JSON.stringify(userData));
   };
 
-  // 🚪 LOGOUT
   const logout = async () => {
     setUser(null);
     await AsyncStorage.removeItem("user");
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

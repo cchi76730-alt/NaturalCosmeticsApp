@@ -2,7 +2,7 @@
 import axios from "axios";
 import { Platform } from "react-native";
 
-const BASE_IP = "192.168.100.109";
+const BASE_IP = "10.18.7.211";
 
 const getBaseURL = () => {
   if (__DEV__) {

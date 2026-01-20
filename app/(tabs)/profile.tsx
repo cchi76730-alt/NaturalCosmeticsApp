@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Platform,
@@ -11,10 +12,33 @@ import {
   View
 } from "react-native";
 import { useAuth } from "../components/context/AuthContext";
+import { getMyStats } from "../services/profile.service";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, logout } = useAuth();
+
+  const [stats, setStats] = useState({
+  orders: 0,
+  favorites: 0,
+  rating: 0,
+});
+
+useEffect(() => {
+  if (!user) return;
+
+  getMyStats()
+    .then((data) => {
+      setStats({
+        orders: data.orders ?? 0,
+        favorites: data.favorites ?? 0,
+        rating: data.rating ?? 0,
+      });
+    })
+    .catch((err) => {
+      console.log("Không load được thống kê", err);
+    });
+}, [user]);
 
   // 🔒 CHẶN CHƯA ĐĂNG NHẬP
   if (!user) {
@@ -74,7 +98,7 @@ const handleLogout = () => {
     icon: "📦",
     title: "Đơn hàng của tôi",
     subtitle: "Xem lịch sử đơn hàng",
-    onPress: () => router.push("../orders"),
+    onPress: () => router.push("/orders"),
   },
 
     {
@@ -91,20 +115,7 @@ const handleLogout = () => {
       subtitle: "Quản lý địa chỉ",
       onPress: () => console.log("Addresses"),
     },
-    {
-      id: 4,
-      icon: "🔔",
-      title: "Thông báo",
-      subtitle: "Cài đặt thông báo",
-      onPress: () => console.log("Notifications"),
-    },
-    {
-      id: 5,
-      icon: "⚙️",
-      title: "Cài đặt",
-      subtitle: "Tùy chỉnh ứng dụng",
-      onPress: () => console.log("Settings"),
-    },
+    
     {
       id: 6,
       icon: "❓",
@@ -185,7 +196,8 @@ const userRole = safeUser.role ?? "customer";
           {/* Edit Profile Button */}
           <TouchableOpacity
             style={styles.editProfileBtn}
-            onPress={() => console.log("Edit profile")}
+            onPress={() => router.push("/edit-profile")}
+
             activeOpacity={0.7}
           >
             <Text style={styles.editProfileIcon}>✏️</Text>
@@ -195,21 +207,26 @@ const userRole = safeUser.role ?? "customer";
 
         {/* ===== QUICK STATS ===== */}
         <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>12</Text>
-            <Text style={styles.statLabel}>Đơn hàng</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>5</Text>
-            <Text style={styles.statLabel}>Yêu thích</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>⭐ 4.8</Text>
-            <Text style={styles.statLabel}>Đánh giá</Text>
-          </View>
-        </View>
+  <View style={styles.statItem}>
+    <Text style={styles.statValue}>{stats.orders}</Text>
+    <Text style={styles.statLabel}>Đơn hàng</Text>
+  </View>
+
+  <View style={styles.statDivider} />
+
+  <View style={styles.statItem}>
+    <Text style={styles.statValue}>{stats.favorites}</Text>
+    <Text style={styles.statLabel}>Yêu thích</Text>
+  </View>
+
+  <View style={styles.statDivider} />
+
+  <View style={styles.statItem}>
+    <Text style={styles.statValue}>⭐ {stats.rating}</Text>
+    <Text style={styles.statLabel}>Đánh giá</Text>
+  </View>
+</View>
+
 
         {/* ===== MENU SECTION ===== */}
         <Text style={styles.sectionTitle}>Tài khoản & Cài đặt</Text>
