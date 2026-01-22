@@ -1,13 +1,23 @@
 import api from "./api";
 
-export const addToCart = (productId: number, quantity = 1) => {
-  return api.post("/cart/add", null, {
-    params: { productId, quantity },
-  });
+// 🛒 THÊM GIỎ HÀNG
+export const addToCart = async (
+  productId: number,
+  quantity: number
+) => {
+  const res = await api.post(
+    `/cart/add?productId=${productId}&quantity=${quantity}`
+  );
+  return res.data;
 };
 
-export const buyNow = (productId: number, quantity = 1) => {
-  return api.post("/cart/buy-now", null, {
-    params: { productId, quantity },
-  });
+// ⚡ MUA NGAY
+export const buyNow = async (
+  productId: number,
+  quantity: number
+) => {
+  const res = await api.post(
+    `/cart/buy-now?productId=${productId}&quantity=${quantity}`
+  );
+  return res.data;
 };

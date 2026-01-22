@@ -1,14 +1,10 @@
-import { User } from "../types/User";
 import api from "./api";
 
-export const updateProfile = async (
-  userId: number,
-  data: {
-    username: string;
-    email?: string;
-    phone?: string;
-  }
-): Promise<User> => {
-  const res = await api.put(`/users/${userId}`, data);
+export const updateProfile = async (id: number, formData: FormData) => {
+  const res = await api.put(`/users/${id}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return res.data;
 };

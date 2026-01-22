@@ -40,10 +40,7 @@ export default function TabLayout() {
       />
       
       <Tabs.Screen
-  name="favorites"
-  options={{
-    title: "Yêu thích",
-  }}
+ 
 />
 
     </Tabs>

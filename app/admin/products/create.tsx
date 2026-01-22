@@ -82,18 +82,30 @@ const handleSubmit = async () => {
       },
     };
 
-    console.log("📤 SENDING PRODUCT:", productData);
-
     await createProduct(productData);
 
-    Alert.alert("✅ Thành công", "Đã thêm sản phẩm", [
-      { text: "OK", onPress: () => router.back() },
-    ]);
+    Alert.alert(
+  "✅ Thành công",
+  "Đã thêm sản phẩm thành công",
+  [
+    {
+      text: "OK",
+      onPress: () => {
+        setTimeout(() => {
+          router.push("/admin/products");
+        }, 100);
+      },
+    },
+  ],
+  { cancelable: false }
+);
+
   } catch (error) {
     console.error("❌ Lỗi create product:", error);
     Alert.alert("❌ Lỗi", "Thêm sản phẩm thất bại");
   }
 };
+
 
 
   // ✅ Hiển thị loading khi đang tải categories

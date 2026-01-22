@@ -1,14 +1,14 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  View,
+  Alert,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
-  StyleSheet,
+  View,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 
 export default function ForgotPassword() {
   const router = useRouter();

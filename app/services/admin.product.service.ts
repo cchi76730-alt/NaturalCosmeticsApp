@@ -1,5 +1,17 @@
 import api from "./api";
 
+export interface Product {
+  id: number;
+  name: string;
+  price: number;
+  stock: number;
+  image?: string;
+  category?: {
+    id: number;
+    name: string;
+  };
+}
+
 export interface CreateProductDto {
   name: string;
   price: number;
@@ -10,11 +22,18 @@ export interface CreateProductDto {
   };
 }
 
+// ================= CREATE =================
 export const createProduct = (data: CreateProductDto) => {
-  return api.post("/products", data);
+  return api.post("/admin/products", data);
 };
 
+// ================= GET ALL (ADMIN) =================
+export const getAdminProducts = async () => {
+  const res = await api.get("/admin/products");
+  return res.data;
+};
 
+// ================= UPDATE =================
 export const updateProduct = async (
   id: number,
   data: {
@@ -25,17 +44,16 @@ export const updateProduct = async (
     categoryId: number;
   }
 ) => {
-  console.log(`📤 UPDATE PRODUCT #${id}:`, data);
   const res = await api.put(`/admin/products/${id}`, data);
-  console.log("📥 RESPONSE:", res.data);
   return res.data;
 };
 
-// ✅ THÊM HÀM XÓA (nếu cần)
+// ================= DELETE =================
+// ================= DELETE =================
 export const deleteProduct = async (id: number) => {
-  console.log("🗑️ DELETE PRODUCT:", id);
+  console.log("🟥 CALL DELETE API:", id);
+
   const res = await api.delete(`/admin/products/${id}`);
-  console.log("📥 RESPONSE:", res.data);
   return res.data;
 };
 

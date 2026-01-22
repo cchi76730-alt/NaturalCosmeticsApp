@@ -1,14 +1,14 @@
 import { Redirect } from "expo-router";
 import { useState } from "react";
 import {
-    FlatList,
-    Image,
-    Platform,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  FlatList,
+  Image,
+  Platform,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import { useAuth } from "../components/context/AuthContext";
 import { useOrders } from "../components/context/OrderContext";

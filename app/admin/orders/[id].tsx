@@ -57,32 +57,27 @@ export default function OrderDetailScreen() {
   };
 
   const handleConfirm = async () => {
-    if (!order) return;
+  if (!order || order.status !== "PENDING") {
+    Alert.alert("Thông báo", "Đơn hàng này đã được xác nhận");
+    return;
+  }
 
-    Alert.alert(
-      "Xác nhận đơn hàng",
-      "Bạn có chắc chắn muốn xác nhận đơn hàng này?",
-      [
-        { text: "Hủy", style: "cancel" },
-        {
-          text: "Xác nhận",
-          onPress: async () => {
-            try {
-              setConfirming(true);
-              await confirmOrder(order.id);
-              await loadOrder();
-              Alert.alert("Thành công", "Đơn hàng đã được xác nhận!");
-            } catch (error) {
-              console.error("Lỗi xác nhận đơn:", error);
-              Alert.alert("Lỗi", "Không thể xác nhận đơn hàng");
-            } finally {
-              setConfirming(false);
-            }
-          },
-        },
-      ]
-    );
-  };
+  try {
+    console.log("▶️ CONFIRM ORDER ID:", order.id);
+
+    const res = await confirmOrder(order.id);
+
+    console.log("✅ CONFIRM RESPONSE:", res);
+
+    setOrder(res); // cập nhật lại state từ backend
+
+    Alert.alert("Thành công", "Xác nhận đơn hàng thành công");
+  } catch (error: any) {
+    console.log("❌ CONFIRM ERROR:", error?.response || error);
+    Alert.alert("Lỗi", "Không xác nhận được đơn hàng");
+  }
+};
+
 
   const getStatusColor = (status: string) => {
     switch (status) {

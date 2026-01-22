@@ -12,7 +12,7 @@ import {
   View
 } from "react-native";
 import { useAuth } from "../components/context/AuthContext";
-import { getMyStats } from "../services/profile.service";
+import { getUserStats } from "../services/profile.service";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -27,18 +27,11 @@ export default function ProfileScreen() {
 useEffect(() => {
   if (!user) return;
 
-  getMyStats()
-    .then((data) => {
-      setStats({
-        orders: data.orders ?? 0,
-        favorites: data.favorites ?? 0,
-        rating: data.rating ?? 0,
-      });
-    })
-    .catch((err) => {
-      console.log("Không load được thống kê", err);
-    });
+  getUserStats(user.id)
+    .then(setStats)
+    .catch(console.log);
 }, [user]);
+
 
   // 🔒 CHẶN CHƯA ĐĂNG NHẬP
   if (!user) {
@@ -101,19 +94,22 @@ const handleLogout = () => {
     onPress: () => router.push("/orders"),
   },
 
-    {
-      id: 2,
-      icon: "❤️",
-      title: "Sản phẩm yêu thích",
-      subtitle: "Danh sách yêu thích",
-      onPress: () => console.log("Favorites"),
-    },
+  {
+  id: 7,
+  icon: "🔑",
+  title: "Đổi mật khẩu",
+  subtitle: "Cập nhật mật khẩu đăng nhập",
+  onPress: () => router.push("/change-password"),
+},
+
+
+    
     {
       id: 3,
       icon: "📍",
       title: "Địa chỉ giao hàng",
       subtitle: "Quản lý địa chỉ",
-      onPress: () => console.log("Addresses"),
+      onPress: () => router.push("/addresses"),
     },
     
     {
@@ -121,7 +117,7 @@ const handleLogout = () => {
       icon: "❓",
       title: "Trợ giúp & Hỗ trợ",
       subtitle: "Câu hỏi thường gặp",
-      onPress: () => console.log("Help"),
+      onPress: () => router.push("/support"),
     },
   ];
 
@@ -214,10 +210,7 @@ const userRole = safeUser.role ?? "customer";
 
   <View style={styles.statDivider} />
 
-  <View style={styles.statItem}>
-    <Text style={styles.statValue}>{stats.favorites}</Text>
-    <Text style={styles.statLabel}>Yêu thích</Text>
-  </View>
+  
 
   <View style={styles.statDivider} />
 

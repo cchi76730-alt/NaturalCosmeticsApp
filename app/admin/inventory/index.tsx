@@ -1,16 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 
-const inventory = [
-  { id: 1, name: "Son môi", stock: 120 },
-  { id: 2, name: "Sữa rửa mặt", stock: 0 },
-  { id: 3, name: "Kem dưỡng", stock: 45 },
-  { id: 4, name: "Nước hoa hồng", stock: 89 },
-  { id: 5, name: "Serum Vitamin C", stock: 15 },
-];
-
 export default function InventoryScreen() {
-const getStockStatus = (stock: number) => {    if (stock === 0) return { text: "Hết hàng", color: "#e74c3c" };
+  const [inventory, setInventory] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchInventory();
+  }, []);
+
+  const fetchInventory = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/api/admin/inventory");
+      const data = await res.json();
+      setInventory(data);
+    } catch (error) {
+      console.log("Lỗi lấy inventory:", error);
+    }
+  };
+
+  const getStockStatus = (stock: number) => {
+    if (stock === 0) return { text: "Hết hàng", color: "#e74c3c" };
     if (stock < 20) return { text: "Sắp hết", color: "#f39c12" };
     return { text: "Còn hàng", color: "#27ae60" };
   };
@@ -49,25 +58,25 @@ const getStockStatus = (stock: number) => {    if (stock === 0) return { text: "
                   <Text style={styles.badgeText}>{status.text}</Text>
                 </View>
               </View>
-              
+
               <View style={styles.stockInfo}>
                 <View style={styles.stockRow}>
                   <Text style={styles.stockLabel}>Tồn kho:</Text>
                   <Text style={[styles.stockValue, { color: status.color }]}>
-                    {item.stock} {item.stock === 1 ? "sản phẩm" : "sản phẩm"}
+                    {item.stock} sản phẩm
                   </Text>
                 </View>
-                
+
                 {item.stock > 0 && (
                   <View style={styles.progressBarContainer}>
-                    <View 
+                    <View
                       style={[
-                        styles.progressBar, 
-                        { 
+                        styles.progressBar,
+                        {
                           width: `${Math.min((item.stock / 120) * 100, 100)}%`,
-                          backgroundColor: status.color 
-                        }
-                      ]} 
+                          backgroundColor: status.color,
+                        },
+                      ]}
                     />
                   </View>
                 )}
@@ -79,6 +88,7 @@ const getStockStatus = (stock: number) => {    if (stock === 0) return { text: "
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: { 
