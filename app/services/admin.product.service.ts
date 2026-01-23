@@ -17,15 +17,16 @@ export interface CreateProductDto {
   price: number;
   stock: number;
   image: string;
-  category: {
-    id: number;
-  };
+  categoryId: number; // ✅
 }
 
+
 // ================= CREATE =================
-export const createProduct = (data: CreateProductDto) => {
+export const createProduct = async (data: any) => {
+  console.log("📦 SEND:", data);
   return api.post("/admin/products", data);
 };
+
 
 // ================= GET ALL (ADMIN) =================
 export const getAdminProducts = async () => {

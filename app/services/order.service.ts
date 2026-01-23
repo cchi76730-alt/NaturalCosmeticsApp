@@ -17,3 +17,11 @@ export const getOrderDetail = async (id: number) => {
   const res = await api.get(`/orders/${id}`);
   return res.data;
 };
+
+export const updateOrderStatus = async (
+  id: number,
+  status: "CONFIRMED" | "CANCELLED"
+) => {
+  const res = await api.put(`/orders/${id}/status`, { status });
+  return res.data;
+};

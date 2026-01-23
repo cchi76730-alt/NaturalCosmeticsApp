@@ -1,5 +1,7 @@
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
+import { Platform } from "react-native";
+
 import {
   ActivityIndicator,
   Alert,
@@ -38,9 +40,26 @@ export default function StaffIndexScreen() {
     return <ActivityIndicator size="large" style={{ marginTop: 60 }} />;
   }
 
-  const handleDelete = (id: number) => {
-  console.log("DELETE STAFF ID:", id); // 🔥 CHECK
+  const handleDelete = async (id: number) => {
+  console.log("DELETE STAFF ID:", id);
 
+  // 🌐 WEB
+  if (Platform.OS === "web") {
+    const ok = window.confirm("Bạn có chắc muốn xóa nhân viên này?");
+    if (!ok) return;
+
+    try {
+      await deleteStaff(id);
+      alert("Đã xóa nhân viên");
+      loadStaffs();
+    } catch (error) {
+      console.log("DELETE ERROR:", error);
+      alert("Không thể xóa");
+    }
+    return;
+  }
+
+  // 📱 MOBILE (Android / iOS)
   Alert.alert(
     "Xác nhận",
     "Bạn có chắc muốn xóa nhân viên này?",
@@ -52,9 +71,7 @@ export default function StaffIndexScreen() {
         onPress: async () => {
           try {
             await deleteStaff(id);
-            console.log("DELETE OK");
-
-            loadStaffs(); // 🔥 RẤT QUAN TRỌNG
+            loadStaffs();
           } catch (error) {
             console.log("DELETE ERROR:", error);
             Alert.alert("Lỗi", "Không thể xóa");
@@ -64,6 +81,7 @@ export default function StaffIndexScreen() {
     ]
   );
 };
+
 
 
 

@@ -18,7 +18,8 @@ import {
 import { useAuth } from "./components/context/AuthContext";
 import { updateProfile } from "./services/user.service";
 
-const BASE_URL = "http://192.168.100.109:8080";
+const BASE_URL = "http://10.18.7.211:8080";
+
 
 export default function EditProfileScreen() {
   const router = useRouter();

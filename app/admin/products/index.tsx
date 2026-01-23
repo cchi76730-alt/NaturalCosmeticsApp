@@ -4,11 +4,10 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
-  Image,
-  Pressable,
+  Image, Platform, Pressable,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
 
 import {
@@ -80,35 +79,45 @@ export default function ProductList() {
       params: { id },
     });
   };
+const handleDelete = async (id: number) => {
+  console.log("🟥 DELETE CLICK:", id);
 
-  const handleDelete = (id: number) => {
-    console.log("🟥 DELETE CLICK:", id);
+  if (Platform.OS === "web") {
+    const ok = window.confirm("Bạn có chắc muốn xóa sản phẩm này?");
+    if (!ok) return;
 
-    Alert.alert(
-      "Xác nhận xóa",
-      "Bạn có chắc muốn xóa sản phẩm này?",
-      [
-        { text: "Hủy", style: "cancel" },
-        {
-          text: "Xóa",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteProduct(id);
+    try {
+      await deleteProduct(id);
+      alert("Đã xóa sản phẩm");
+      setProducts((prev) => prev.filter((p) => p.id !== id));
+    } catch (error) {
+      alert("Không thể xóa sản phẩm");
+    }
+    return;
+  }
 
-              Alert.alert("✅ Thành công", "Đã xóa sản phẩm");
-
-              setProducts((prev) => prev.filter((p) => p.id !== id));
-            } catch (error) {
-              console.error("DELETE ERROR:", error);
-              Alert.alert("Lỗi", "Không thể xóa sản phẩm");
-            }
-          },
+  // 📱 Mobile
+  Alert.alert(
+    "Xác nhận xóa",
+    "Bạn có chắc muốn xóa sản phẩm này?",
+    [
+      { text: "Hủy", style: "cancel" },
+      {
+        text: "Xóa",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await deleteProduct(id);
+            Alert.alert("Thành công", "Đã xóa sản phẩm");
+            setProducts((prev) => prev.filter((p) => p.id !== id));
+          } catch (error) {
+            Alert.alert("Lỗi", "Không thể xóa sản phẩm");
+          }
         },
-      ]
-    );
-  };
-
+      },
+    ]
+  );
+};
   /* ================= RENDER ITEM ================= */
   const renderProduct = ({ item }: { item: Product }) => {
     const imageSource =

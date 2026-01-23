@@ -50,55 +50,56 @@ export default function CheckoutScreen() {
 
 
   const handleOrder = async () => {
-    if (!user) {
-      Alert.alert("❌ Chưa đăng nhập", "Vui lòng đăng nhập để đặt hàng");
-      router.push("/(auth)/login");
-      return;
-    }
+  if (!user) {
+    Alert.alert("❌ Chưa đăng nhập");
+    router.push("/(auth)/login");
+    return;
+  }
 
-    if (!name || !phone || !address) {
-      Alert.alert("⚠️ Lỗi", "Vui lòng nhập đầy đủ thông tin");
-      return;
-    }
+  if (!name || !phone || !address) {
+    Alert.alert("⚠️ Lỗi", "Vui lòng nhập đầy đủ thông tin");
+    return;
+  }
 
-    if (items.length === 0) {
-      Alert.alert("⚠️ Giỏ hàng trống");
-      return;
-    }
+  if (items.length === 0) {
+    Alert.alert("⚠️ Giỏ hàng trống");
+    return;
+  }
 
-    try {
-      await createOrder({
-        userId: user.id,
-        customerName: name,
-        phone,
-        address,
-        totalPrice,
-        items: items.map((i) => ({
-          productId: i.product.id,
-          quantity: i.quantity,
-          price: i.product.price,
-        })),
-      });
+  try {
+    // ✅ 1. Tạo đơn hàng (PENDING)
+    const order = await createOrder({
+      userId: user.id,
+      customerName: name,
+      phone,
+      address,
+      totalPrice,
+      items: items.map((i) => ({
+        productId: i.product.id,
+        quantity: i.quantity,
+        price: i.product.price,
+      })),
+    });
 
-      addOrder({
-  id: Date.now(), // tạm thời
-  totalPrice,
-  createdAt: new Date().toLocaleString(),
-  items,
-});
+    clearCart();
 
-      Alert.alert("🎉 Thành công", "Đặt hàng thành công!");
-      clearCart();
-      router.replace("/orders");
-    } catch (error) {
-      console.error(error);
-      Alert.alert("❌ Lỗi", "Không thể đặt hàng");
-    }
-  };
+    // ✅ 2. Sang màn QR
+    router.push({
+      pathname: "/payment-qr",
+      params: {
+        orderId: order.id,      // 🔥 CỰC QUAN TRỌNG
+        amount: totalPrice,
+      },
+    });
+  } catch (error) {
+    Alert.alert("❌ Lỗi", "Không thể đặt hàng");
+  }
+};
+
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🧾 Thanh toán</Text>
+<Text style={styles.title}>🧾 Thanh toán</Text>
 
       <FlatList
         data={items}

@@ -2,14 +2,12 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 
-const LOCAL_IP = "192.168.100.109";
+const LOCAL_IP = "10.18.7.211";
 
 const API_URL =
-  Platform.OS === "android"
-    ? "http://10.0.2.2:8080/api"   // Android Emulator
-    : Platform.OS === "web"
+  Platform.OS === "web"
     ? "http://localhost:8080/api"
-    : "http://192.168.100.109:8080/api"; // iOS / Expo Go
+    : `http://${LOCAL_IP}:8080/api`;
 
 
 const api = axios.create({

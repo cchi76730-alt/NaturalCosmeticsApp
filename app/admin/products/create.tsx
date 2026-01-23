@@ -1,6 +1,7 @@
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+
 import {
   ActivityIndicator,
   Alert,
@@ -73,16 +74,21 @@ const handleSubmit = async () => {
 
   try {
     const productData = {
-      name: name.trim(),
-      price: Number(price),
-      stock: Number(stock),
-      image: image.trim(),
-      category: {
-        id: categoryId,
-      },
-    };
+  name: name.trim(),
+  price: Number(price),
+  stock: Number(stock),
+  image: image.trim(),
+  active: true,
+  featured: false,
+  description: null,
+  categoryId: categoryId,
+};
 
-    await createProduct(productData);
+await createProduct(productData);
+
+
+await createProduct(productData);
+
 
     Alert.alert(
   "✅ Thành công",
@@ -100,10 +106,17 @@ const handleSubmit = async () => {
   { cancelable: false }
 );
 
-  } catch (error) {
-    console.error("❌ Lỗi create product:", error);
-    Alert.alert("❌ Lỗi", "Thêm sản phẩm thất bại");
-  }
+  } catch (error: any) {
+  console.log("❌ ERROR:", error);
+  console.log("❌ STATUS:", error?.response?.status);
+  console.log("❌ DATA:", error?.response?.data);
+
+  Alert.alert(
+    "❌ Lỗi",
+    error?.response?.data?.message || "Thêm sản phẩm thất bại"
+  );
+}
+
 };
 
 
