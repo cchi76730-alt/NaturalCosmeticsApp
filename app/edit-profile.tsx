@@ -2,23 +2,23 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    Alert,
-    Animated,
-    Image,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Animated,
+  Image,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import { useAuth } from "./components/context/AuthContext";
 import { updateProfile } from "./services/user.service";
 
-const BASE_URL = "http://10.18.7.211:8080";
+const BASE_URL = "http://10.18.7.214:8080";
 
 
 export default function EditProfileScreen() {

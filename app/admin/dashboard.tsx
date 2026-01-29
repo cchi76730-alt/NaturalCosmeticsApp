@@ -73,7 +73,7 @@ const handleConfirm = async (orderId: number) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>Xin chào 👋</Text>
+        <Text style={styles.greeting}>Xin chào Cindy 👋</Text>
         <Text style={styles.subtitle}>Tổng quan hôm nay</Text>
       </View>
 

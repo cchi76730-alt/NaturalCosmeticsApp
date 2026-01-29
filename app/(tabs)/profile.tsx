@@ -16,7 +16,7 @@ import { useAuth } from "../components/context/AuthContext";
 import { getUserStats } from "../services/profile.service";
 
 /* 🔥 BASE URL API */
-const BASE_URL = "http://10.18.7.211:8080";
+const BASE_URL = "http://10.18.7.214:8080";
 
 /* 🔥 HÀM LẤY AVATAR */
 const getAvatarUri = (avatar?: string | null) => {

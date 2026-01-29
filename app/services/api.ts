@@ -2,7 +2,7 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 
-const LOCAL_IP = "10.18.7.211";
+const LOCAL_IP = "10.18.7.214";
 
 const API_URL =
   Platform.OS === "web"

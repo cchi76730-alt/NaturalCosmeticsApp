@@ -2,14 +2,15 @@ import { Picker } from "@react-native-picker/picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { updateProduct } from "../../services/admin.product.service";
 import { getCategories } from "../../services/category.service";
@@ -30,11 +31,10 @@ export default function EditProductScreen() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      loadData();
-    }
+    if (id) loadData();
   }, [id]);
 
+  /* ================= LOAD DATA ================= */
   const loadData = async () => {
     try {
       setLoading(true);
@@ -49,22 +49,22 @@ export default function EditProductScreen() {
       setPrice(productData.price.toString());
       setStock(productData.stock?.toString() || "0");
       setImage(productData.image || "");
-      setCategoryId(productData.category?.id || categoriesData[0]?.id || 0);
+      setCategoryId(
+        productData.category?.id || categoriesData[0]?.id || 0
+      );
 
       console.log("✅ Loaded product:", productData);
     } catch (error) {
       console.error("❌ Lỗi load data:", error);
       Alert.alert("Lỗi", "Không thể tải dữ liệu sản phẩm", [
-        {
-          text: "Quay lại",
-          onPress: () => router.back(),
-        },
+        { text: "Quay lại", onPress: () => router.back() },
       ]);
     } finally {
       setLoading(false);
     }
   };
 
+  /* ================= SUBMIT ================= */
   const handleSubmit = async () => {
     if (!name.trim()) {
       Alert.alert("Lỗi", "Vui lòng nhập tên sản phẩm");
@@ -101,12 +101,22 @@ export default function EditProductScreen() {
 
       await updateProduct(Number(id), productData);
 
-      Alert.alert("✅ Thành công", "Đã cập nhật sản phẩm", [
-        {
-          text: "OK",
-          onPress: () => router.back(),
-        },
-      ]);
+      /* ✅ ALERT CHẠY ĐÚNG WEB + MOBILE */
+      if (Platform.OS === "web") {
+        window.alert("✅ Sản phẩm đã được cập nhật thành công");
+        router.replace("/admin/products");
+      } else {
+        Alert.alert(
+          "✅ Thành công",
+          "Sản phẩm đã được cập nhật thành công",
+          [
+            {
+              text: "OK",
+              onPress: () => router.replace("/admin/products"),
+            },
+          ]
+        );
+      }
     } catch (error) {
       console.error("❌ Lỗi update product:", error);
       Alert.alert("❌ Lỗi", "Cập nhật sản phẩm thất bại");
@@ -115,6 +125,7 @@ export default function EditProductScreen() {
     }
   };
 
+  /* ================= UI STATES ================= */
   if (!id) {
     return (
       <View style={[styles.container, styles.centerContent]}>
@@ -135,6 +146,7 @@ export default function EditProductScreen() {
     );
   }
 
+  /* ================= RENDER ================= */
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
@@ -176,13 +188,11 @@ export default function EditProductScreen() {
 
         <View style={styles.pickerBox}>
           <Picker
-            selectedValue={categoryId || categories[0]?.id}
+            selectedValue={categoryId}
             onValueChange={(v) => setCategoryId(Number(v))}
             style={styles.picker}
           >
-            {categoryId === 0 && (
-              <Picker.Item label="-- Chọn danh mục --" value={0} />
-            )}
+            <Picker.Item label="-- Chọn danh mục --" value={0} />
             {categories.map((c) => (
               <Picker.Item key={c.id} label={c.name} value={c.id} />
             ))}
@@ -215,6 +225,7 @@ export default function EditProductScreen() {
   );
 }
 
+/* ================= STYLES ================= */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
